@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CUBE RUNNER</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════════ CANVAS ═══════════════ -->
+<canvas id="gameCanvas"></canvas>
+
+<!-- ═══════════════ HUD ═══════════════ -->
+<div id="hud" class="hidden">
+  <div class="hud-box">
+    <svg class="hud-icon" viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="9" fill="#FFD700" stroke="#a08000" stroke-width="2"/>
+      <text x="10" y="14" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#a08000">$</text>
+    </svg>
+    <div>
+      <span class="hud-label">MONEDAS</span>
+      <div class="hud-val" id="hudCoins">0</div>
+    </div>
+  </div>
+
+  <div class="hud-box" style="flex-direction:column;align-items:center;">
+    <span class="hud-label" style="text-align:center;">DISTANCIA</span>
+    <div class="hud-val" id="hudDist">0</div>
+  </div>
+
+  <div class="health-bar-wrap">
+    <div class="health-label">VIDA</div>
+    <div class="health-bar-bg">
+      <div class="health-bar-fill" id="healthFill" style="width:100%"></div>
+    </div>
+  </div>
+</div>
+
+<button id="pauseBtn">⏸ PAUSA</button>
+<div id="speedIndicator">VEL: <span id="speedVal">1</span>x</div>
+<div id="powerupHUD"></div>
+<div id="flashOverlay"></div>
+<div id="touchHint">TAP = SALTAR &nbsp;|&nbsp; DOBLE TAP = DOBLE SALTO</div>
+
+<!-- ═══════════════ PANTALLA: NOMBRE ═══════════════ -->
+<div id="nameScreen" class="screen">
+  <div class="stars" id="starsName"></div>
+  <div class="panel">
+    <div style="text-align:center;">
+      <div class="logo-cube" style="margin:0 auto 14px;"></div>
+      <div class="name-title">CUBE RUNNER</div>
+      <div class="name-sub">¿Cómo te llamas, corredor?</div>
+    </div>
+    <div class="name-input-wrap">
+      <input
+        type="text"
+        id="nameInput"
+        maxlength="12"
+        placeholder="TU NOMBRE"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <div class="name-counter"><span id="nameLen">0</span>/12</div>
+      <div class="name-error" id="nameError"></div>
+    </div>
+    <button class="btn primary" onclick="saveName()" style="width:100%;margin:0;">
+      ▶ COMENZAR
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════ PANTALLA: MENÚ ═══════════════ -->
+<div id="menuScreen" class="screen hidden">
+  <div class="stars" id="starsMenu"></div>
+  <div class="logo-wrap">
+    <div class="logo-cube"></div>
+    <span class="logo-main">CUBE RUNNER</span>
+    <div class="logo-sub">∞ INFINITE RUN ∞</div>
+  </div>
+  <div class="menu-player-tag">👤 <span id="menuPlayerName">---</span></div>
+  <button class="btn primary" onclick="startGame()">▶ JUGAR</button>
+  <button class="btn gold"    onclick="showScreen('shopScreen')">🏪 TIENDA</button>
+  <button class="btn"         onclick="openLeaderboard()">🌍 RANKING GLOBAL</button>
+  <button class="btn"         onclick="showScreen('optScreen')">⚙ OPCIONES</button>
+  <div class="menu-footer">
+    MEJOR: <span id="menuBest" style="color:#FFD700">0m</span>
+    &nbsp;|&nbsp; 💰 <span id="menuTotalCoins" style="color:#FFD700">0</span>
+  </div>
+</div>
+
+<!-- ═══════════════ PANTALLA: TIENDA ═══════════════ -->
+<div id="shopScreen" class="screen hidden">
+  <div class="stars" id="starsShop"></div>
+  <div class="panel">
+    <div class="shop-title">🏪 TIENDA</div>
+    <div class="shop-coins">💰 MONEDAS: <span id="shopCoinVal">0</span></div>
+
+    <div class="shop-section">
+      <div class="shop-section-title">🎨 SKINS DEL PERSONAJE</div>
+      <div class="shop-grid" id="skinsGrid"></div>
+    </div>
+
+    <div class="shop-section">
+      <div class="shop-section-title">⚡ POTENCIADORES</div>
+      <div id="powerupsShop"></div>
+    </div>
+
+    <button class="btn" onclick="showScreen('menuScreen')" style="margin-top:16px;width:100%;">← VOLVER</button>
+  </div>
+</div>
+
+<!-- ═══════════════ PANTALLA: RANKING GLOBAL ═══════════════ -->
+<div id="lbScreen" class="screen hidden">
+  <div class="panel">
+    <div class="lb-title">🌍 RANKING GLOBAL</div>
+    <div class="lb-subtitle" id="lbSubtitle">Cargando...</div>
+    <div id="lbList"></div>
+    <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;justify-content:center;">
+      <button class="btn" onclick="openLeaderboard()" style="width:auto;padding:10px 18px;font-size:8px;">🔄 ACTUALIZAR</button>
+      <button class="btn" onclick="showScreen('menuScreen')" style="width:auto;padding:10px 18px;font-size:8px;">← VOLVER</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PANTALLA: OPCIONES ═══════════════ -->
+<div id="optScreen" class="screen hidden">
+  <div class="panel">
+    <div class="opt-title">⚙ OPCIONES</div>
+
+    <div class="opt-row">
+      <span class="opt-label">🎵 MÚSICA</span>
+      <div class="toggle" id="togMusic" onclick="toggleOpt('music')"></div>
+    </div>
+    <div class="opt-row">
+      <span class="opt-label">🔊 SONIDOS</span>
+      <div class="toggle" id="togSfx" onclick="toggleOpt('sfx')"></div>
+    </div>
+    <div class="opt-row">
+      <span class="opt-label">⚡ DIFICULTAD</span>
+      <button class="btn" id="diffBtn" onclick="cycleDiff()" style="width:auto;padding:8px 16px;font-size:8px;margin:0;">NORMAL</button>
+    </div>
+    <div class="opt-row">
+      <span class="opt-label">✏️ CAMBIAR NOMBRE</span>
+      <button class="btn" onclick="changeName()" style="width:auto;padding:8px 12px;font-size:7px;margin:0;">EDITAR</button>
+    </div>
+    <div class="opt-row">
+      <span class="opt-label">🗑 BORRAR DATOS</span>
+      <button class="btn danger" onclick="clearData()" style="width:auto;padding:8px 12px;font-size:7px;margin:0;">RESET</button>
+    </div>
+
+    <button class="btn" onclick="showScreen('menuScreen')" style="margin-top:16px;width:100%;">← VOLVER</button>
+  </div>
+</div>
+
+<!-- ═══════════════ PANTALLA: PAUSA ═══════════════ -->
+<div id="pauseScreen" class="screen hidden">
+  <div class="panel" style="text-align:center;">
+    <div class="pause-title">⏸ PAUSADO</div>
+    <button class="btn primary" onclick="resumeGame()">▶ CONTINUAR</button>
+    <button class="btn gold"    onclick="showScreen('shopScreen')">🏪 TIENDA</button>
+    <button class="btn"         onclick="showScreen('optScreen')">⚙ OPCIONES</button>
+    <button class="btn danger"  onclick="gotoMenu()">✕ SALIR</button>
+  </div>
+</div>
+
+<!-- ═══════════════ PANTALLA: GAME OVER ═══════════════ -->
+<div id="gameoverScreen" class="screen hidden">
+  <div class="panel" style="text-align:center;">
+    <div class="go-title">💀 GAME OVER</div>
+    <div id="goRecordBadge"></div>
+    <div class="go-stat">DISTANCIA: <span id="goDistance">0</span>m</div>
+    <div class="go-stat">MONEDAS: <span id="goCoins">0</span></div>
+    <div class="go-best" id="goNewBest"></div>
+    <div id="goUploadStatus" style="font-family:'VT323',monospace;font-size:16px;color:#666;margin-bottom:8px;"></div>
+    <button class="btn primary" onclick="startGame()" style="margin-top:4px;">🔄 REINTENTAR</button>
+    <button class="btn"         onclick="gotoMenu()">🏠 INICIO</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
