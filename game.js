@@ -1,5 +1,3 @@
-
-
 const FIREBASE_URL = " https://primero-339b8-default-rtdb.firebaseio.com" 
 // ↑ CAMBIA ESTO por tu URL de Firebase Realtime Database
 
