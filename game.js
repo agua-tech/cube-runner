@@ -1,24 +1,15 @@
-// ════════════════════════════════════════════════════════════
-//  CUBE RUNNER — game.js
-//  Para el ranking global necesitas una base de datos Firebase:
-//  1. Ve a https://console.firebase.google.com
-//  2. Crea un proyecto → Realtime Database → "Modo de prueba"
-//  3. Copia la URL (ej: https://mi-proyecto-default-rtdb.firebaseio.com)
-//  4. Pégala en FIREBASE_URL aquí abajo
-// ════════════════════════════════════════════════════════════
+
 
 const FIREBASE_URL = " https://primero-339b8-default-rtdb.firebaseio.com" 
 // ↑ CAMBIA ESTO por tu URL de Firebase Realtime Database
 
-// ════════════════════════════════════════════════════════════
-//  DATOS GUARDADOS (localStorage)
-// ════════════════════════════════════════════════════════════
+
 const SAVE_KEY = 'cuberunner_v3';
 let save = {
   playerName: '',
   coins: 0,
   best: 0,
-  leaderboard: [],          // ranking local de respaldo
+  leaderboard: [],          
   ownedSkins: ['default'],
   equippedSkin: 'default',
   ownedPowerups: { magnet: 0, shield: 0, doubleJump: 0 },
@@ -46,9 +37,6 @@ function clearData() {
   }
 }
 
-// ════════════════════════════════════════════════════════════
-//  SISTEMA DE NOMBRE
-// ════════════════════════════════════════════════════════════
 function initNameScreen() {
   const input = document.getElementById('nameInput');
   const counter = document.getElementById('nameLen');
