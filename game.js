@@ -75,9 +75,6 @@ function changeName() {
   showScreen('nameScreen');
 }
 
-// ════════════════════════════════════════════════════════════
-//  FIREBASE — RANKING GLOBAL
-// ════════════════════════════════════════════════════════════
 async function fetchGlobalLeaderboard() {
   try {
     const res = await fetch(`${FIREBASE_URL}/leaderboard.json`);
